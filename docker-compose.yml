@@ -1,0 +1,43 @@
+version: "3.2"
+
+services:
+  bank-db:
+    image: postgres:latest
+    container_name: bank-db
+    ports:
+      - target: 5432
+        published: 5434
+        protocol: tcp
+        mode: host
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: bank_db
+
+  camunda-db:
+    image: postgres:latest
+    container_name: camunda-db
+    ports:
+      - target: 5432
+        published: 5433
+        protocol: tcp
+        mode: host
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: camunda_db
+    
+  camunda:
+    image: camunda/camunda-bpm-platform
+    container_name: camunda
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    environment:
+      DB_DRIVER: org.postgresql.Driver
+      DB_URL: jdbc:postgresql://camunda-db:5432/camunda_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: admin
+    depends_on:
+      - "camunda-db"
+      - "bank-db"
